@@ -60,7 +60,6 @@ class Config
             }
 
             $item = [
-                'active' => !isset($row['active']) || (string)$row['active'] === '1' ? '1' : '0',
                 'email' => trim((string)($row['email'] ?? '')),
                 'telephone' => trim((string)($row['telephone'] ?? '')),
                 'firstname' => trim((string)($row['firstname'] ?? '')),

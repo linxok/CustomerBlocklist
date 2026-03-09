@@ -7,7 +7,7 @@ Magento 2 module for blocking fraudulent customers during storefront checkout.
 - Block checkout by customer email
 - Block checkout by customer phone number
 - Block checkout by customer first name and last name pair
-- Single blacklist rules list with per-rule `Active` flag
+- Simple blacklist rules list
 - Custom frontend error message from admin configuration
 - Logging of blocked checkout attempts in admin panel
 - CSV export of logs
@@ -23,8 +23,8 @@ Magento 2 module for blocking fraudulent customers during storefront checkout.
   - first name + last name
 - Name matching requires both first name and last name
 - Rules are managed manually from the Magento admin panel
-- Only active blacklist rules are applied during checkout validation
-- Inactive rules remain stored in configuration but are ignored by the matcher
+- If a rule exists in the blacklist, it blocks checkout
+- To stop blocking, delete the rule from the list
 
 ## Module Name
 
@@ -59,7 +59,7 @@ After installation, configure the module in Magento admin.
 Available areas include:
 
 - module enable/disable
-- blacklist rules with `Active`, `Email`, `Tel`, `First`, `Last`, and `Note` columns
+- blacklist rules with `Email`, `Tel`, `First`, `Last`, and `Note` columns
 - custom blocking message
 - blocked attempts log
 - add current order customer data to blacklist from the order view page
@@ -71,8 +71,8 @@ Available areas include:
   - `Email`
   - `Tel`
   - `First` + `Last`
-- The `Active` checkbox disables a rule without deleting it
-- Rules added from the order view are saved as active by default
+- Any rule present in the list will block matching customers
+- To disable blocking, delete the rule from the list
 - Completely empty rows are ignored on save
 
 ## Logging

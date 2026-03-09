@@ -31,7 +31,6 @@ class AddOrderToBlacklist
     {
         $billingAddress = $order->getBillingAddress();
         $rule = [
-            'active' => '1',
             'email' => trim((string)$order->getCustomerEmail()),
             'telephone' => trim((string)($billingAddress ? $billingAddress->getTelephone() : '')),
             'firstname' => trim((string)($billingAddress ? $billingAddress->getFirstname() : '')),

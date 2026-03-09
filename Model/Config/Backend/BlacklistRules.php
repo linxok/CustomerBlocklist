@@ -26,7 +26,6 @@ class BlacklistRules extends ArraySerialized
             }
 
             $normalizedRow = [
-                'active' => isset($row['active']) && (string)$row['active'] === '0' ? '0' : '1',
                 'email' => trim((string)($row['email'] ?? '')),
                 'telephone' => trim((string)($row['telephone'] ?? '')),
                 'firstname' => trim((string)($row['firstname'] ?? '')),
