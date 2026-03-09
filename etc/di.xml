@@ -12,4 +12,11 @@
     <type name="Magento\Sales\Block\Adminhtml\Order\View">
         <plugin name="mycompany_customerblocklist_order_view_button" type="MyCompany\CustomerBlocklist\Plugin\Sales\OrderViewButtonPlugin" sortOrder="10"/>
     </type>
+    <type name="MyCompany\CustomerBlocklist\Block\Adminhtml\System\Config\Form\Field\Rules">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="template" xsi:type="string">MyCompany_CustomerBlocklist::system/config/form/field/array.phtml</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
