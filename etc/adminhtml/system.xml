@@ -23,7 +23,7 @@
                 <field id="blacklist" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Blacklist Rules</label>
                     <frontend_model>MyCompany\CustomerBlocklist\Block\Adminhtml\System\Config\Form\Field\Rules</frontend_model>
-                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <backend_model>MyCompany\CustomerBlocklist\Model\Config\Backend\BlacklistRules</backend_model>
                 </field>
             </group>
         </section>

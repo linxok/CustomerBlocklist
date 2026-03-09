@@ -72,19 +72,11 @@ script;
     $scriptString .= <<<script
 
                     + '<td class="col-actions"><button '
-                    + 'class="action-delete" type="button">'
+                    + 'class="action-delete" type="button" onclick="arrayRow{$block->escapeJs($_htmlId)}.del(\'row_<%- _id %>\'); return false;">'
                     + '<span>{$block->escapeJs(__('Delete'))}<\/span><\/button><\/td>'
                     + '<\/tr>'
 
 script;
-    $scriptString1 = /* $noEscape */ $secureRenderer->renderEventListenerAsTag(
-        'onclick',
-        "arrayRow" . $block->escapeJs($_htmlId) . ".del('row_<%- _id %>')",
-        "tr#row_<%- _id %> button.action-delete"
-    );
-
-    $scriptString .= " + '" . $block->escapeJs($scriptString1) . "'" . PHP_EOL;
-
     $scriptString .= <<<script
             ),
 
@@ -95,6 +87,14 @@ script;
                 // Prepare template values
                 if (rowData) {
                     templateValues = rowData;
+                    if (rowData.column_values) {
+                        Object.keys(rowData.column_values).forEach(function (inputId) {
+                            var matches = inputId.match(/_([a-zA-Z0-9]+)$/);
+                            if (matches && matches[1]) {
+                                templateValues[matches[1]] = rowData.column_values[inputId];
+                            }
+                        });
+                    }
                 } else {
                     var d = new Date();
                     templateValues = {

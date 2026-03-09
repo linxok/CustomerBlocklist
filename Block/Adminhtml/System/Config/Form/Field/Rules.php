@@ -3,6 +3,7 @@
 namespace MyCompany\CustomerBlocklist\Block\Adminhtml\System\Config\Form\Field;
 
 use Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray;
+use Magento\Framework\DataObject;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
 class Rules extends AbstractFieldArray
@@ -71,6 +72,34 @@ class Rules extends AbstractFieldArray
         $html .= $this->_renderHint($element);
 
         return $this->_decorateRowHtml($element, $html);
+    }
+
+    protected function _prepareArrayRow(DataObject $row): void
+    {
+        $defaults = [
+            'active' => '1',
+            'email' => '',
+            'telephone' => '',
+            'firstname' => '',
+            'lastname' => '',
+            'note' => '',
+        ];
+
+        $columnValues = (array)$row->getData('column_values');
+        $rowId = (string)$row->getData('_id');
+
+        foreach ($defaults as $field => $defaultValue) {
+            if ($row->getData($field) === null) {
+                $row->setData($field, $defaultValue);
+            }
+
+            $columnInputId = $this->_getCellInputElementId($rowId, $field);
+            if (!array_key_exists($columnInputId, $columnValues)) {
+                $columnValues[$columnInputId] = (string)$row->getData($field);
+            }
+        }
+
+        $row->setData('column_values', $columnValues);
     }
 
     private function getActiveRenderer(): ActiveCheckbox
