@@ -1,0 +1,8 @@
+vendor/
+generated/
+var/
+.pub/
+.idea/
+.vscode/
+.DS_Store
+*.log

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="MyCompany_CustomerBlocklist::config" title="Customer Blocklist Configuration" sortOrder="60"/>
+                        </resource>
+                    </resource>
+                </resource>
+                <resource id="MyCompany_CustomerBlocklist::root" title="Customer Blocklist" sortOrder="70">
+                    <resource id="MyCompany_CustomerBlocklist::logs" title="Attempt Logs" sortOrder="10">
+                        <resource id="MyCompany_CustomerBlocklist::logs_export" title="Export Logs" sortOrder="10"/>
+                        <resource id="MyCompany_CustomerBlocklist::logs_clear" title="Clear Logs" sortOrder="20"/>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,118 @@
+<?php $logs = $block->getLogs(); ?>
+<div class="page-actions">
+    <div class="page-actions-buttons">
+        <button class="action-default scalable" type="button" onclick="window.location.href='<?= $block->escapeUrl($block->getUrl('*/*/exportCsv')) ?>'">
+            <span><?= $block->escapeHtml(__('Export to CSV')) ?></span>
+        </button>
+        <button class="action-default scalable" type="button" onclick="clearLogs('all')">
+            <span><?= $block->escapeHtml(__('Clear All Logs')) ?></span>
+        </button>
+        <button class="action-default scalable" type="button" onclick="clearLogs('30')">
+            <span><?= $block->escapeHtml(__('Clear Logs Older Than 30 Days')) ?></span>
+        </button>
+        <button class="action-default scalable" type="button" onclick="clearLogs('90')">
+            <span><?= $block->escapeHtml(__('Clear Logs Older Than 90 Days')) ?></span>
+        </button>
+    </div>
+</div>
+
+<div class="admin__data-grid-wrap admin__data-grid-wrap-static">
+    <table class="data-grid">
+        <thead>
+        <tr>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Date')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Store ID')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Quote ID')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Email')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Telephone')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Name')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Matched List')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Matched Field')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('Matched Value')) ?></span></th>
+            <th class="data-grid-th"><span><?= $block->escapeHtml(__('IP')) ?></span></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php if (!$logs): ?>
+            <tr>
+                <td colspan="10"><?= $block->escapeHtml(__('No blocked checkout attempts found.')) ?></td>
+            </tr>
+        <?php else: ?>
+            <?php foreach ($logs as $log): ?>
+                <tr>
+                    <td><?= $block->escapeHtml($log->getData('created_at')) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('store_id')) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('quote_id')) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('customer_email')) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('telephone')) ?></td>
+                    <td><?= $block->escapeHtml(trim((string)$log->getData('firstname') . ' ' . (string)$log->getData('lastname'))) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('matched_list')) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('matched_field')) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('matched_value')) ?></td>
+                    <td><?= $block->escapeHtml($log->getData('remote_ip')) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
+<?php
+$totalCount = $block->getTotalCount();
+$currentPage = $block->getCurrentPage();
+$pageSize = $block->getPageSize();
+$totalPages = ceil($totalCount / $pageSize);
+?>
+
+<?php if ($totalPages > 1): ?>
+<div class="admin__data-grid-pager">
+    <div class="admin__data-grid-pager-wrap">
+        <div class="admin__data-grid-pager-info">
+            <?= $block->escapeHtml(__('Showing %1-%2 of %3 records', 
+                ($currentPage - 1) * $pageSize + 1,
+                min($currentPage * $pageSize, $totalCount),
+                $totalCount
+            )) ?>
+        </div>
+        <div class="admin__data-grid-pager-pages">
+            <?php if ($currentPage > 1): ?>
+                <a href="<?= $block->escapeUrl($block->getUrl('*/*/*', ['p' => $currentPage - 1, 'limit' => $pageSize])) ?>" class="action-previous">
+                    <span><?= $block->escapeHtml(__('Previous')) ?></span>
+                </a>
+            <?php endif; ?>
+            
+            <?php for ($i = max(1, $currentPage - 2); $i <= min($totalPages, $currentPage + 2); $i++): ?>
+                <?php if ($i == $currentPage): ?>
+                    <span class="page current"><?= $block->escapeHtml($i) ?></span>
+                <?php else: ?>
+                    <a href="<?= $block->escapeUrl($block->getUrl('*/*/*', ['p' => $i, 'limit' => $pageSize])) ?>" class="page">
+                        <?= $block->escapeHtml($i) ?>
+                    </a>
+                <?php endif; ?>
+            <?php endfor; ?>
+            
+            <?php if ($currentPage < $totalPages): ?>
+                <a href="<?= $block->escapeUrl($block->getUrl('*/*/*', ['p' => $currentPage + 1, 'limit' => $pageSize])) ?>" class="action-next">
+                    <span><?= $block->escapeHtml(__('Next')) ?></span>
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<script type="text/javascript">
+    function clearLogs(days) {
+        var message = days === 'all' 
+            ? '<?= $block->escapeJs(__('Are you sure you want to delete ALL log entries?')) ?>'
+            : '<?= $block->escapeJs(__('Are you sure you want to delete log entries older than %1 days?')) ?>'.replace('%1', days);
+        
+        if (confirm(message)) {
+            var url = '<?= $block->escapeUrl($block->getUrl('*/*/clear')) ?>';
+            if (days !== 'all') {
+                url += '?days=' + days;
+            }
+            window.location.href = url;
+        }
+    }
+</script>

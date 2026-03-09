@@ -1,0 +1,17 @@
+{
+    "name": "mycompany/module-customer-blocklist",
+    "description": "Magento 2 module for blocking fraudulent customers by email, phone, or full name with whitelist override and attempt logging.",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "proprietary"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MyCompany\\CustomerBlocklist\\": ""
+        }
+    }
+}

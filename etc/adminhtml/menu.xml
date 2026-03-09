@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="MyCompany_CustomerBlocklist::root" title="Customer Blocklist" module="MyCompany_CustomerBlocklist" sortOrder="60" resource="MyCompany_CustomerBlocklist::root" parent="Magento_Customer::customer"/>
+        <add id="MyCompany_CustomerBlocklist::configuration" title="Configuration" module="MyCompany_CustomerBlocklist" sortOrder="10" resource="MyCompany_CustomerBlocklist::config" parent="MyCompany_CustomerBlocklist::root" action="adminhtml/system_config/edit/section/customerblocklist"/>
+        <add id="MyCompany_CustomerBlocklist::logs" title="Attempt Logs" module="MyCompany_CustomerBlocklist" sortOrder="20" resource="MyCompany_CustomerBlocklist::logs" parent="MyCompany_CustomerBlocklist::root" action="customerblocklist/log/index"/>
+    </menu>
+</config>
