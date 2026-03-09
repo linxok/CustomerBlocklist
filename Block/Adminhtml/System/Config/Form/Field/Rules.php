@@ -7,16 +7,16 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 
 class Rules extends AbstractFieldArray
 {
-    private ?TransferButton $transferRenderer = null;
+    private ?ActiveCheckbox $activeRenderer = null;
 
     protected function _prepareToRender()
     {
-        $this->addColumn('email', ['label' => __('Email'), 'style' => 'width: 260px;', 'size' => '40']);
-        $this->addColumn('telephone', ['label' => __('Telephone'), 'style' => 'width: 180px;', 'size' => '22']);
-        $this->addColumn('firstname', ['label' => __('First Name'), 'style' => 'width: 180px;', 'size' => '22']);
-        $this->addColumn('lastname', ['label' => __('Last Name'), 'style' => 'width: 180px;', 'size' => '22']);
-        $this->addColumn('note', ['label' => __('Note'), 'style' => 'width: 320px;', 'size' => '50']);
-        $this->addColumn('transfer_action', ['label' => __('Transfer'), 'renderer' => $this->getTransferRenderer()]);
+        $this->addColumn('active', ['label' => __('Active'), 'renderer' => $this->getActiveRenderer(), 'style' => 'width: 70px; text-align:center;']);
+        $this->addColumn('email', ['label' => __('Email'), 'style' => 'width: 180px;', 'size' => '25']);
+        $this->addColumn('telephone', ['label' => __('Tel'), 'style' => 'width: 120px;', 'size' => '15']);
+        $this->addColumn('firstname', ['label' => __('First'), 'style' => 'width: 100px;', 'size' => '12']);
+        $this->addColumn('lastname', ['label' => __('Last'), 'style' => 'width: 100px;', 'size' => '12']);
+        $this->addColumn('note', ['label' => __('Note'), 'style' => 'width: 200px;', 'size' => '30']);
         $this->_addAfter = false;
         $this->_addButtonLabel = __('Add Rule');
     }
@@ -24,6 +24,7 @@ class Rules extends AbstractFieldArray
     public function render(AbstractElement $element)
     {
         $isCheckboxRequired = $this->_isInheritCheckboxRequired($element);
+        $htmlId = $element->getHtmlId();
 
         if ($element->getInherit() == 1 && $isCheckboxRequired) {
             $element->setDisabled(true);
@@ -39,7 +40,23 @@ class Rules extends AbstractFieldArray
         $html .= '<label for="' . $element->getHtmlId() . '"><span' . $this->_renderScopeLabel($element) . '>' . $element->getLabel() . '</span></label>';
         $html .= '</div>';
         $html .= $this->_getElementHtml($element);
-        $html .= '<script>require(["customerBlocklistTransferRule"]);</script>';
+        $html .= '<script>'
+            . 'require(["jquery"], function ($) {'
+            . 'var sync = function () {'
+            . '$("#' . $this->escapeJs($htmlId) . ' .customerblocklist-rule-active").each(function () {'
+            . 'var $hidden = $(this);'
+            . 'var $checkbox = $hidden.siblings(".customerblocklist-rule-active-toggle").first();'
+            . 'if ($checkbox.length) {'
+            . '$checkbox.prop("checked", $hidden.val() !== "0");'
+            . '}'
+            . '});'
+            . '};'
+            . 'sync();'
+            . '$(document).off("change.customerblocklistActiveSync-' . $this->escapeJs($htmlId) . '", "#' . $this->escapeJs($htmlId) . ' .customerblocklist-rule-active");'
+            . '$(document).on("change.customerblocklistActiveSync-' . $this->escapeJs($htmlId) . '", "#' . $this->escapeJs($htmlId) . ' .customerblocklist-rule-active", sync);'
+            . 'setTimeout(sync, 0);'
+            . '});'
+            . '</script>';
 
         if ($element->getComment()) {
             $html .= '<p class="note"><span>' . $element->getComment() . '</span></p>';
@@ -56,38 +73,20 @@ class Rules extends AbstractFieldArray
         return $this->_decorateRowHtml($element, $html);
     }
 
-    private function getTransferRenderer(): TransferButton
+    private function getActiveRenderer(): ActiveCheckbox
     {
-        if ($this->transferRenderer === null) {
-            $this->transferRenderer = $this->getLayout()->createBlock(
-                TransferButton::class,
+        if ($this->activeRenderer === null) {
+            $this->activeRenderer = $this->getLayout()->createBlock(
+                ActiveCheckbox::class,
                 '',
                 [
                     'data' => [
-                        'source_list' => $this->getSourceListType(),
-                        'target_list' => $this->getTargetListType(),
                         'is_render_to_js_template' => true,
                     ],
                 ]
             );
         }
 
-        $this->transferRenderer->setData('source_list', $this->getSourceListType());
-        $this->transferRenderer->setData('target_list', $this->getTargetListType());
-
-        return $this->transferRenderer;
-    }
-
-    private function getSourceListType(): string
-    {
-        $element = $this->getElement();
-        $name = $element ? (string)$element->getName() : '';
-
-        return strpos($name, '[blacklist]') !== false ? 'blacklist' : 'whitelist';
-    }
-
-    private function getTargetListType(): string
-    {
-        return $this->getSourceListType() === 'blacklist' ? 'whitelist' : 'blacklist';
+        return $this->activeRenderer;
     }
 }

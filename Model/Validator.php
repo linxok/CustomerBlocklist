@@ -44,11 +44,6 @@ class Validator
             (string)(($billingAddress ? $billingAddress->getLastname() : '') ?: ($quoteBillingAddress ? $quoteBillingAddress->getLastname() : ''))
         );
 
-        $whitelistMatch = $this->ruleMatcher->getMatch($this->config->getWhitelistRules($storeId), $context, 'whitelist');
-        if ($whitelistMatch) {
-            return;
-        }
-
         $blacklistMatch = $this->ruleMatcher->getMatch($this->config->getBlacklistRules($storeId), $context, 'blacklist');
         if (!$blacklistMatch) {
             return;

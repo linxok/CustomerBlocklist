@@ -23,6 +23,20 @@ class Move extends Action
         $sourceList = (string)$this->getRequest()->getParam('source_list');
         $targetList = (string)$this->getRequest()->getParam('target_list');
         $backUrl = (string)$this->getRequest()->getParam('back_url');
+        $store = (string)$this->getRequest()->getParam('store');
+        $website = (string)$this->getRequest()->getParam('website');
+        
+        $scope = 'default';
+        $scopeId = 0;
+        
+        if ($store !== '') {
+            $scope = 'stores';
+            $scopeId = (int)$store;
+        } elseif ($website !== '') {
+            $scope = 'websites';
+            $scopeId = (int)$website;
+        }
+        
         $rule = [
             'email' => (string)$this->getRequest()->getParam('email'),
             'telephone' => (string)$this->getRequest()->getParam('telephone'),
@@ -32,7 +46,7 @@ class Move extends Action
         ];
 
         try {
-            $addedToTarget = $this->moveRuleBetweenLists->execute($sourceList, $targetList, $rule);
+            $addedToTarget = $this->moveRuleBetweenLists->execute($sourceList, $targetList, $rule, $scope, $scopeId);
             if ($addedToTarget) {
                 $this->messageManager->addSuccessMessage(__('The rule was moved to %1.', ucfirst($targetList)));
             } else {

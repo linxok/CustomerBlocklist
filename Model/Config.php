@@ -10,7 +10,6 @@ class Config
     private const XML_PATH_ENABLED = 'customerblocklist/general/enabled';
     private const XML_PATH_MESSAGE = 'customerblocklist/general/checkout_message';
     private const XML_PATH_BLACKLIST = 'customerblocklist/rules/blacklist';
-    private const XML_PATH_WHITELIST = 'customerblocklist/rules/whitelist';
 
     private ScopeConfigInterface $scopeConfig;
     private Json $json;
@@ -37,11 +36,6 @@ class Config
         return $this->getRules(self::XML_PATH_BLACKLIST, $storeId);
     }
 
-    public function getWhitelistRules(?int $storeId = null): array
-    {
-        return $this->getRules(self::XML_PATH_WHITELIST, $storeId);
-    }
-
     private function getRules(string $path, ?int $storeId = null): array
     {
         $raw = $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
@@ -66,6 +60,7 @@ class Config
             }
 
             $item = [
+                'active' => !isset($row['active']) || (string)$row['active'] === '1' ? '1' : '0',
                 'email' => trim((string)($row['email'] ?? '')),
                 'telephone' => trim((string)($row['telephone'] ?? '')),
                 'firstname' => trim((string)($row['firstname'] ?? '')),

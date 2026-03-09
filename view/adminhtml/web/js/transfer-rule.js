@@ -4,44 +4,53 @@ define([
 ], function ($, confirmation) {
     'use strict';
 
-    window.customerBlocklistMoveRule = function(button, sourceList, targetList) {
+    function updateButtonState($button, isMarked) {
+        var label = isMarked ? $button.attr('data-marked-label') : $button.attr('data-default-label');
+
+        $button.toggleClass('customerblocklist-transfer-pending', isMarked);
+        $button.find('span').text(label || '');
+    }
+
+    function moveRule(button) {
         var $button = $(button);
-        var $row = $button.closest('tr');
-        
-        if (!$row.length) {
+        var targetList = $button.attr('data-target-list');
+        var $hidden = $button.siblings('.customerblocklist-transfer-action').first();
+
+        if (!$hidden.length || !targetList) {
             return;
         }
-
-        var params = {
-            source_list: sourceList,
-            target_list: targetList,
-            back_url: window.location.href
-        };
-
-        ['email', 'telephone', 'firstname', 'lastname', 'note'].forEach(function(field) {
-            var $input = $row.find('input[name$="[' + field + ']"]');
-            params[field] = $input.length ? $input.val() : '';
-        });
 
         var message = targetList === 'whitelist' 
-            ? $.mage.__('Move this rule to Whitelist?')
-            : $.mage.__('Move this rule to Blacklist?');
-
-        var url = $button.data('move-url');
-        if (!url) {
-            console.error('Move URL not found');
-            return;
-        }
+            ? $.mage.__('Mark this rule to move to Whitelist on Save Config?')
+            : $.mage.__('Mark this rule to move to Blacklist on Save Config?');
 
         confirmation({
             title: $.mage.__('Confirm Transfer'),
             content: message,
             actions: {
                 confirm: function() {
-                    var queryString = $.param(params);
-                    window.location.href = url + '?' + queryString;
+                    var newValue = $hidden.val() === targetList ? '' : targetList;
+                    $hidden.val(newValue).trigger('change');
+                    updateButtonState($button, !!newValue);
                 }
             }
         });
-    };
+    }
+
+    function syncInitialState(context) {
+        $(context || document).find('.customerblocklist-transfer').each(function () {
+            var $button = $(this);
+            var $hidden = $button.siblings('.customerblocklist-transfer-action').first();
+            updateButtonState($button, !!$hidden.val());
+        });
+    }
+
+    $(document).off('click.customerblocklistTransfer').on('click.customerblocklistTransfer', '.customerblocklist-transfer', function (event) {
+        event.preventDefault();
+        moveRule(this);
+    });
+
+    syncInitialState(document);
+
+    window.customerBlocklistMoveRule = moveRule;
 });

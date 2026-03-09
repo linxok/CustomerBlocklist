@@ -21,7 +21,10 @@ class OrderViewButtonPlugin
             return;
         }
 
-        if (!$this->authorization->isAllowed('MyCompany_CustomerBlocklist::add_from_order')) {
+        if (
+            !$this->authorization->isAllowed('MyCompany_CustomerBlocklist::add_from_order')
+            && !$this->authorization->isAllowed('MyCompany_CustomerBlocklist::config')
+        ) {
             return;
         }
 

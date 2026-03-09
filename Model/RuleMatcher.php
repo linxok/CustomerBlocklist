@@ -22,6 +22,10 @@ class RuleMatcher
                 continue;
             }
 
+            if (isset($rule['active']) && (string)$rule['active'] !== '1') {
+                continue;
+            }
+
             $ruleEmail = $this->normalizer->normalizeEmail((string)($rule['email'] ?? ''));
             if ($ruleEmail !== '' && $email !== '' && $ruleEmail === $email) {
                 return ['list' => $listType, 'field' => 'email', 'value' => $rule['email'] ?? '', 'note' => $rule['note'] ?? ''];

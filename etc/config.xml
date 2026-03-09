@@ -8,7 +8,6 @@
             </general>
             <rules>
                 <blacklist>[]</blacklist>
-                <whitelist>[]</whitelist>
             </rules>
         </customerblocklist>
     </default>

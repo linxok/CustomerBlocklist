@@ -28,7 +28,7 @@ class MoveRuleBetweenLists
         $this->normalizer = $normalizer;
     }
 
-    public function execute(string $sourceList, string $targetList, array $rule): bool
+    public function execute(string $sourceList, string $targetList, array $rule, string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, int $scopeId = 0): bool
     {
         if (!$this->isSupportedList($sourceList) || !$this->isSupportedList($targetList) || $sourceList === $targetList) {
             throw new LocalizedException(__('Invalid source or target list.'));
@@ -39,8 +39,8 @@ class MoveRuleBetweenLists
             throw new LocalizedException(__('Rule does not contain enough data to move.'));
         }
 
-        $sourceRules = $this->getRules($sourceList);
-        $targetRules = $this->getRules($targetList);
+        $sourceRules = $this->getRules($sourceList, $scope, $scopeId);
+        $targetRules = $this->getRules($targetList, $scope, $scopeId);
         $sourceChanged = false;
 
         foreach ($sourceRules as $index => $existingRule) {
@@ -67,15 +67,15 @@ class MoveRuleBetweenLists
             $targetRules[] = $rule;
         }
 
-        $this->saveRules($sourceList, array_values($sourceRules));
-        $this->saveRules($targetList, array_values($targetRules));
+        $this->saveRules($sourceList, array_values($sourceRules), $scope, $scopeId);
+        $this->saveRules($targetList, array_values($targetRules), $scope, $scopeId);
 
         return !$targetExists;
     }
 
-    private function getRules(string $list): array
+    private function getRules(string $list, string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, int $scopeId = 0): array
     {
-        $raw = $this->scopeConfig->getValue($this->getPathByList($list), ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
+        $raw = $this->scopeConfig->getValue($this->getPathByList($list), $scope, $scopeId);
         if (!$raw) {
             return [];
         }
@@ -101,13 +101,13 @@ class MoveRuleBetweenLists
         return $result;
     }
 
-    private function saveRules(string $list, array $rules): void
+    private function saveRules(string $list, array $rules, string $scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT, int $scopeId = 0): void
     {
         $this->configWriter->save(
             $this->getPathByList($list),
             $this->json->serialize($rules),
-            ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
-            0
+            $scope,
+            $scopeId
         );
     }
 
@@ -134,13 +134,32 @@ class MoveRuleBetweenLists
 
     private function isSameRule(array $existingRule, array $rule): bool
     {
-        return $this->normalizer->normalizeEmail((string)($existingRule['email'] ?? ''))
-                === $this->normalizer->normalizeEmail((string)($rule['email'] ?? ''))
-            && $this->normalizer->normalizeTelephone((string)($existingRule['telephone'] ?? ''))
-                === $this->normalizer->normalizeTelephone((string)($rule['telephone'] ?? ''))
-            && $this->normalizer->normalizeName((string)($existingRule['firstname'] ?? ''))
-                === $this->normalizer->normalizeName((string)($rule['firstname'] ?? ''))
-            && $this->normalizer->normalizeName((string)($existingRule['lastname'] ?? ''))
-                === $this->normalizer->normalizeName((string)($rule['lastname'] ?? ''));
+        $existingEmail = $this->normalizer->normalizeEmail((string)($existingRule['email'] ?? ''));
+        $ruleEmail = $this->normalizer->normalizeEmail((string)($rule['email'] ?? ''));
+        
+        if ($existingEmail !== '' && $ruleEmail !== '' && $existingEmail === $ruleEmail) {
+            return true;
+        }
+
+        $existingTelephone = $this->normalizer->normalizeTelephone((string)($existingRule['telephone'] ?? ''));
+        $ruleTelephone = $this->normalizer->normalizeTelephone((string)($rule['telephone'] ?? ''));
+        
+        if ($existingTelephone !== '' && $ruleTelephone !== '' && $existingTelephone === $ruleTelephone) {
+            return true;
+        }
+
+        $existingFirstname = $this->normalizer->normalizeName((string)($existingRule['firstname'] ?? ''));
+        $existingLastname = $this->normalizer->normalizeName((string)($existingRule['lastname'] ?? ''));
+        $ruleFirstname = $this->normalizer->normalizeName((string)($rule['firstname'] ?? ''));
+        $ruleLastname = $this->normalizer->normalizeName((string)($rule['lastname'] ?? ''));
+        
+        if ($existingFirstname !== '' && $existingLastname !== '' 
+            && $ruleFirstname !== '' && $ruleLastname !== ''
+            && $existingFirstname === $ruleFirstname 
+            && $existingLastname === $ruleLastname) {
+            return true;
+        }
+
+        return false;
     }
 }
