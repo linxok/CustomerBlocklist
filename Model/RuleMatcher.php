@@ -13,7 +13,7 @@ class RuleMatcher
     public function getMatch(array $rules, CheckoutContext $context, string $listType): ?array
     {
         $email = $this->normalizer->normalizeEmail($context->getEmail());
-        $telephone = $this->normalizer->normalizeTelephone($context->getTelephone());
+        $telephoneVariants = $this->normalizer->getTelephoneVariants($context->getTelephone());
         $firstname = $this->normalizer->normalizeName($context->getFirstname());
         $lastname = $this->normalizer->normalizeName($context->getLastname());
 
@@ -31,8 +31,8 @@ class RuleMatcher
                 return ['list' => $listType, 'field' => 'email', 'value' => $rule['email'] ?? '', 'note' => $rule['note'] ?? ''];
             }
 
-            $ruleTelephone = $this->normalizer->normalizeTelephone((string)($rule['telephone'] ?? ''));
-            if ($ruleTelephone !== '' && $telephone !== '' && $ruleTelephone === $telephone) {
+            $ruleTelephoneVariants = $this->normalizer->getTelephoneVariants((string)($rule['telephone'] ?? ''));
+            if ($ruleTelephoneVariants !== [] && $telephoneVariants !== [] && array_intersect($ruleTelephoneVariants, $telephoneVariants)) {
                 return ['list' => $listType, 'field' => 'telephone', 'value' => $rule['telephone'] ?? '', 'note' => $rule['note'] ?? ''];
             }
 

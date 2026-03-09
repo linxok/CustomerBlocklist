@@ -13,6 +13,26 @@ class Normalizer
         return preg_replace('/\D+/', '', (string)$value) ?: '';
     }
 
+    public function getTelephoneVariants(?string $value): array
+    {
+        $normalized = $this->normalizeTelephone($value);
+        if ($normalized === '') {
+            return [];
+        }
+
+        $variants = [$normalized];
+
+        if (strlen($normalized) > 10 && str_starts_with($normalized, '380')) {
+            $variants[] = '0' . substr($normalized, 3);
+        }
+
+        if (strlen($normalized) === 10 && str_starts_with($normalized, '0')) {
+            $variants[] = '38' . $normalized;
+        }
+
+        return array_values(array_unique(array_filter($variants)));
+    }
+
     public function normalizeName(?string $value): string
     {
         $value = trim((string)$value);
