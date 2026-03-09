@@ -1,6 +1,7 @@
 <?php
 namespace MyCompany\CustomerBlocklist\Model;
 
+use Magento\Framework\App\Config\ReinitableConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -14,17 +15,20 @@ class AddOrderToBlacklist
     private WriterInterface $configWriter;
     private Json $json;
     private Normalizer $normalizer;
+    private ReinitableConfigInterface $reinitableConfig;
 
     public function __construct(
         Config $config,
         WriterInterface $configWriter,
         Json $json,
-        Normalizer $normalizer
+        Normalizer $normalizer,
+        ReinitableConfigInterface $reinitableConfig
     ) {
         $this->config = $config;
         $this->configWriter = $configWriter;
         $this->json = $json;
         $this->normalizer = $normalizer;
+        $this->reinitableConfig = $reinitableConfig;
     }
 
     public function execute(OrderInterface $order): bool
@@ -46,6 +50,7 @@ class AddOrderToBlacklist
             throw new LocalizedException(__('Order does not contain enough customer data to add to the blacklist.'));
         }
 
+        $this->reinitableConfig->reinit();
         $rules = $this->config->getBlacklistRules();
 
         foreach ($rules as $existingRule) {
