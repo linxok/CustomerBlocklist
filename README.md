@@ -7,11 +7,12 @@ Magento 2 module for blocking fraudulent customers during storefront checkout.
 - Block checkout by customer email
 - Block checkout by customer phone number
 - Block checkout by customer first name and last name pair
-- Whitelist override with higher priority than blacklist
+- Single blacklist rules list with per-rule `Active` flag
 - Custom frontend error message from admin configuration
 - Logging of blocked checkout attempts in admin panel
 - CSV export of logs
 - Log cleanup actions from admin panel
+- Add customer data to blacklist directly from the admin order view
 
 ## Business Rules
 
@@ -21,8 +22,9 @@ Magento 2 module for blocking fraudulent customers during storefront checkout.
   - phone
   - first name + last name
 - Name matching requires both first name and last name
-- Whitelist entries take precedence over blacklist entries
 - Rules are managed manually from the Magento admin panel
+- Only active blacklist rules are applied during checkout validation
+- Inactive rules remain stored in configuration but are ignored by the matcher
 
 ## Module Name
 
@@ -57,13 +59,29 @@ After installation, configure the module in Magento admin.
 Available areas include:
 
 - module enable/disable
-- blacklist rules
-- whitelist rules
+- blacklist rules with `Active`, `Email`, `Tel`, `First`, `Last`, and `Note` columns
 - custom blocking message
 - blocked attempts log
+- add current order customer data to blacklist from the order view page
+
+## Blacklist Rules
+
+- Rules are managed in a single `Blacklist Rules` table
+- Each rule can match by:
+  - `Email`
+  - `Tel`
+  - `First` + `Last`
+- The `Active` checkbox disables a rule without deleting it
+- Rules added from the order view are saved as active by default
+- Completely empty rows are ignored on save
+
+## Logging
+
+- Blocked checkout attempts are stored in `mycompany_customerblocklist_attempt_log`
+- Log entries contain matched field and matched value details
+- Logs can be reviewed, exported to CSV, and cleared from the admin panel
 
 ## Notes
 
 - The module is intended for storefront checkout validation
-- Existing broken order payment data in the project is unrelated to the core blocking logic
 - This repository contains only the Magento module source code
