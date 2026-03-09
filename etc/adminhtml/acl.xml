@@ -11,6 +11,7 @@
                     </resource>
                 </resource>
                 <resource id="MyCompany_CustomerBlocklist::root" title="Customer Blocklist" sortOrder="70">
+                    <resource id="MyCompany_CustomerBlocklist::add_from_order" title="Add Customer To Blacklist From Order" sortOrder="5"/>
                     <resource id="MyCompany_CustomerBlocklist::logs" title="Attempt Logs" sortOrder="10">
                         <resource id="MyCompany_CustomerBlocklist::logs_export" title="Export Logs" sortOrder="10"/>
                         <resource id="MyCompany_CustomerBlocklist::logs_clear" title="Clear Logs" sortOrder="20"/>
